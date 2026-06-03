@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/hooks/use-auth";
 import { Camera, Plus, X, Check } from "lucide-react";
 
 export const Route = createFileRoute("/profil-architecte")({
@@ -28,6 +29,7 @@ const SERVICES = [
 ];
 
 function ProfilArchitecte() {
+  const { user } = useAuth();
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
@@ -77,6 +79,7 @@ function ProfilArchitecte() {
     setSaving(true);
     try {
       const { error } = await supabase.from("architect_profiles").upsert({
+        user_id: user?.id,
         name: form.name,
         title: form.title,
         city: form.city,
@@ -86,7 +89,7 @@ function ProfilArchitecte() {
         availability_notes: form.availability_notes,
         starting_price: form.starting_price ? parseInt(form.starting_price) : null,
         updated_at: new Date().toISOString(),
-      });
+      }, { onConflict: "user_id" });
       if (error) throw error;
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
