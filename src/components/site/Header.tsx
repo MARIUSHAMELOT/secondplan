@@ -1,7 +1,8 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, UserCircle, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/use-auth";
 
 const nav = [
   { to: "/search", label: "Trouver un architecte" },
@@ -13,6 +14,15 @@ const nav = [
 
 export function Header() {
   const [open, setOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  async function handleSignOut() {
+    await signOut();
+    navigate({ to: "/" });
+  }
+
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur">
       <div className="container-page flex h-16 items-center justify-between gap-6">
@@ -28,7 +38,44 @@ export function Header() {
           ))}
         </nav>
         <div className="hidden lg:flex items-center gap-3">
-          <Link to="/login" className="text-sm text-foreground/80 hover:text-primary">Connexion</Link>
+          {user ? (
+            <div className="relative">
+              <button
+                onClick={() => setMenuOpen(!menuOpen)}
+                className="flex items-center gap-2 text-sm text-foreground/80 hover:text-primary transition-colors"
+              >
+                <UserCircle className="h-5 w-5" />
+                <span>{user.user_metadata?.name || user.email?.split("@")[0]}</span>
+              </button>
+              {menuOpen && (
+                <div className="absolute right-0 top-8 w-48 rounded-xl border border-border bg-card shadow-lg py-1 z-50">
+                  <Link
+                    to="/dashboard"
+                    onClick={() => setMenuOpen(false)}
+                    className="block px-4 py-2 text-sm hover:bg-secondary transition-colors"
+                  >
+                    Mon espace
+                  </Link>
+                  <Link
+                    to="/profil-architecte"
+                    onClick={() => setMenuOpen(false)}
+                    className="block px-4 py-2 text-sm hover:bg-secondary transition-colors"
+                  >
+                    Mon profil
+                  </Link>
+                  <hr className="my-1 border-border" />
+                  <button
+                    onClick={handleSignOut}
+                    className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-secondary transition-colors flex items-center gap-2"
+                  >
+                    <LogOut className="h-3.5 w-3.5" /> Déconnexion
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Link to="/login" className="text-sm text-foreground/80 hover:text-primary">Connexion</Link>
+          )}
           <Button asChild className="rounded-full">
             <Link to="/booking">Réserver une visite</Link>
           </Button>
@@ -45,7 +92,14 @@ export function Header() {
                 {n.label}
               </Link>
             ))}
-            <Link to="/login" onClick={() => setOpen(false)} className="py-1 text-sm">Connexion</Link>
+            {user ? (
+              <>
+                <Link to="/dashboard" onClick={() => setOpen(false)} className="py-1 text-sm">Mon espace</Link>
+                <button onClick={handleSignOut} className="py-1 text-sm text-left text-red-500">Déconnexion</button>
+              </>
+            ) : (
+              <Link to="/login" onClick={() => setOpen(false)} className="py-1 text-sm">Connexion</Link>
+            )}
             <Button asChild className="rounded-full mt-2"><Link to="/booking">Réserver une visite</Link></Button>
           </div>
         </div>
