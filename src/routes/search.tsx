@@ -10,13 +10,10 @@ export const Route = createFileRoute("/search")({
 });
 
 const filters = [
-  { title: "Localisation", options: ["Paris", "Lyon", "Bordeaux", "Marseille", "Nantes"] },
   { title: "Disponibilité", options: ["Cette semaine", "Sous 48h", "Week-end", "Ce mois-ci"] },
-  { title: "Type de bien", options: ["Appartement", "Maison", "Local commercial", "Immeuble"] },
+  { title: "Type de bien", options: ["Appartement", "Maison", "Local commercial", "Immeuble", "Péniche", "Bâtiment classé"] },
   { title: "Type de visite", options: ["Express", "Conseil", "Projet"] },
-  { title: "Budget", options: ["< 250 €", "250–500 €", "500–800 €", "800 € +"] },
   { title: "Expérience", options: ["< 5 ans", "5–10 ans", "10 ans +"] },
-  { title: "Note client", options: ["4.5+", "4.8+", "5.0"] },
 ];
 
 function SearchPage() {
